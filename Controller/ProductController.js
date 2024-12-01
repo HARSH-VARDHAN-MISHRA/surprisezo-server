@@ -31,6 +31,7 @@ const createProduct = async (req, res) => {
         refrenceCompanyUrl,
         innersubcategoryName,
         customisecake,
+        customisemessage,
         customisename,
         customisenameValue
     } = req.body;
@@ -107,6 +108,7 @@ const createProduct = async (req, res) => {
         customisecake: customisecake || null,
         customisename: customisename || null,
         customisenameValue: customisenameValue || null,
+        customisemessage: customisemessage || null,
         productSubDescription: productSubDescription || null,
         productDescription: productDescription || null,
         refrenceCompany: refrenceCompany ? new mongoose.Types.ObjectId(refrenceCompany) : null, // Optional field
@@ -233,6 +235,7 @@ const updateProduct = async (req, res) => {
         refrenceCompanyUrl,
         customisecake,
         customisename,
+        customisemessage,
         customisenameValue,
         innersubcategoryName
     } = req.body;
@@ -296,6 +299,7 @@ const updateProduct = async (req, res) => {
         product.productSubDescription = productSubDescription || null;
         product.customisecake = customisecake || null,
         product.customisename = customisename || null,
+        product.customisemessage = customisemessage || null,
         product.productDescription = productDescription || null;
         product.customisenameValue = customisenameValue || null;
         product.refrenceCompany = validateObjectId(refrenceCompany);

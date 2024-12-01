@@ -82,6 +82,9 @@ const productSchema = new mongoose.Schema({
     customisecake: {
         type: String,
     },
+    customisemessage: {
+        type: String,
+    },
     customisename: {
         type: String,
     },

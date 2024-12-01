@@ -4,14 +4,7 @@ const upload = require("../MiddleWare/Multer");
 
 const ProductTagRouter = express.Router();
 
-ProductTagRouter.post(
-    "/create-producttag",
-    upload.fields([
-        { name: "image", maxCount: 1 },
-        { name: "priceRangeImages", maxCount: 10 },
-    ]),
-    createProductTag
-);
+ProductTagRouter.post("/create-producttag", createProductTag);
 
 ProductTagRouter.get("/get-producttag", getAllProductTags);
 ProductTagRouter.get("/single-producttag/:id", getProductTagById);
@@ -19,14 +12,7 @@ ProductTagRouter.get('/get-product-tag-by-taghrading/:tagHeading', getProductTag
 ProductTagRouter.get('/get-product-tag-by-taghrading-and-range/:tagHeading', getProductsByTagAndPriceRange);
 
 
-ProductTagRouter.put(
-    "/update-producttag/:id",
-    upload.fields([
-        { name: "image", maxCount: 1 },
-        { name: "priceRangeImages", maxCount: 10 },
-    ]),
-    updateProductTag
-);
+ProductTagRouter.put("/update-producttag/:id",updateProductTag);
 
 ProductTagRouter.delete("/delete-producttag/:id", deleteProductTag);
 

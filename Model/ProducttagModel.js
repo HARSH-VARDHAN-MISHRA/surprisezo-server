@@ -1,10 +1,6 @@
 const mongoose = require("mongoose")
 
 const priceRangeSchema = new mongoose.Schema({
-    priceRangeImage: {
-        type: String,
-        required: true
-    },
     priceMinimum: {
         type: String,
         required: true
@@ -22,10 +18,6 @@ const ProducttageModel = new mongoose.Schema({
         required: true
     },
     sortDescription: {
-        type: String,
-        required: true
-    },
-    image: {
         type: String,
         required: true
     },

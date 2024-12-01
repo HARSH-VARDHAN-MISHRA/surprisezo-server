@@ -1,83 +1,47 @@
 const ProductTag = require("../Model/ProducttagModel");
-const fs = require("fs");
-const path = require("path");
 const mongoose = require('mongoose');
 
-// Helper function to delete an image file
-const deleteImageFile = (relativeFilePath) => {
-    const absolutePath = path.join(__dirname, "..", relativeFilePath);
-    fs.unlink(absolutePath, (err) => {
-        if (err) {
-            console.error(`Failed to delete image: ${absolutePath}`, err);
-        } else {
-            console.log(`Image deleted: ${absolutePath}`);
-        }
-    });
-};
 
-
-// Create a new Product Tag
 exports.createProductTag = async (req, res) => {
     try {
-        console.log(req.files);
         console.log(req.body);
 
         const { tagHeading, sortDescription, multipulProduct, priceRange } = req.body;
-        const image = req.files ? req.files.image[0].path : null;
 
-        const parsedPriceRange = priceRange ? JSON.parse(priceRange) : [];
+        // Parse priceRange only if it's a JSON string
+        const parsedPriceRange = Array.isArray(priceRange) ? priceRange : JSON.parse(priceRange || "[]");
 
-        // Add image paths for priceRange items if they are uploaded
-        if (req.files && req.files.priceRangeImages) {
-            req.files.priceRangeImages.forEach((file, index) => {
-                if (parsedPriceRange[index]) {
-                    parsedPriceRange[index].priceRangeImage = file.path;
-                }
-            });
-        }
-
-        // Check if a product tag with the same tagHeading already exists (case-insensitive)
+        // Validate tagHeading and sortDescription uniqueness
         const existingTagHeading = await ProductTag.findOne({
-            tagHeading: { $regex: `^${tagHeading.trim()}$`, $options: 'i' } // Case-insensitive check
+            tagHeading: { $regex: `^${tagHeading.trim()}$`, $options: 'i' },
         });
-
         if (existingTagHeading) {
-            return res.status(400).json({
-                success: false,
-                message: 'Product tag with this tagHeading already exists'
-            });
+            return res.status(400).json({ success: false, message: 'Tag heading already exists' });
         }
 
-        // Check if a product tag with the same sortDescription already exists (case-insensitive)
         const existingSortDescription = await ProductTag.findOne({
-            sortDescription: { $regex: `^${sortDescription.trim()}$`, $options: 'i' } // Case-insensitive check
+            sortDescription: { $regex: `^${sortDescription.trim()}$`, $options: 'i' },
         });
-
         if (existingSortDescription) {
-            return res.status(400).json({
-                success: false,
-                message: 'Product tag with this sortDescription already exists'
-            });
+            return res.status(400).json({ success: false, message: 'Sort description already exists' });
         }
 
-        // Create new product tag if both tagHeading and sortDescription are unique
+        // Create the product tag
         const newProductTag = new ProductTag({
             tagHeading,
             sortDescription,
-            image,
             multipulProduct,
             priceRange: parsedPriceRange,
         });
 
         const savedProductTag = await newProductTag.save();
-
         res.status(201).json({
             success: true,
             message: "Product tag created successfully",
             data: savedProductTag,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Failed to create product tag",
@@ -87,14 +51,12 @@ exports.createProductTag = async (req, res) => {
 };
 
 
+
 exports.updateProductTag = async (req, res) => {
     try {
         console.log(req.body);
-        console.log(req.files);
-
         const { id } = req.params;
         const updates = req.body;
-        const newImage = req.file ? req.file.filename : null;
 
         // Fetch the existing product tag by ID
         const productTag = await ProductTag.findById(id);
@@ -134,10 +96,6 @@ exports.updateProductTag = async (req, res) => {
             }
         }
 
-        // Delete the old tag image if a new one is uploaded
-        if (newImage && productTag.image) {
-            deleteImageFile(productTag.image);
-        }
 
         // Parse and validate multipulProduct field
         const parsedMultipulProduct = updates.multipulProduct
@@ -152,25 +110,12 @@ exports.updateProductTag = async (req, res) => {
         // Process priceRange updates
         const parsedPriceRange = updates.priceRange ? JSON.parse(updates.priceRange) : [];
 
-        if (req.files && req.files.priceRangeImages) {
-            req.files.priceRangeImages.forEach((file, index) => {
-                if (parsedPriceRange[index]) {
-                    // Delete old priceRange image if a new one is uploaded
-                    const oldImage = productTag.priceRange[index]?.priceRangeImage;
-                    if (oldImage) deleteImageFile(oldImage);
-
-                    parsedPriceRange[index].priceRangeImage = file.filename;
-                }
-            });
-        }
-
         // Perform the update with the new data
         const updatedProductTag = await ProductTag.findByIdAndUpdate(
             id,
             {
                 ...updates,
                 multipulProduct: parsedMultipulProduct,
-                image: newImage || productTag.image,
                 priceRange: parsedPriceRange,
             },
             { new: true, runValidators: true }
@@ -323,7 +268,7 @@ exports.getProductsByTagAndPriceRange = async (req, res) => {
 exports.deleteProductTag = async (req, res) => {
     try {
         const { id } = req.params;
-
+        console.log(id)
         const productTag = await ProductTag.findByIdAndDelete(id);
 
         if (!productTag) {
@@ -332,16 +277,7 @@ exports.deleteProductTag = async (req, res) => {
                 message: "Product tag not found",
             });
         }
-
-        // Delete the main image
-        if (productTag.image) {
-            deleteImageFile(productTag.image);
-        }
-
-        // Delete all priceRange images
-        const priceRangeImages = productTag.priceRange.map(
-            (range) => range.priceRangeImage)
-        deleteImageFile(priceRangeImages);
+        await productTag.deleteOne()
 
         res.status(200).json({
             success: true,
