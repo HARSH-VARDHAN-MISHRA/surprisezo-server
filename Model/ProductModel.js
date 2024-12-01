@@ -88,7 +88,13 @@ const productSchema = new mongoose.Schema({
     customisename: {
         type: String,
     },
-    customisenameValue:{
+    customisenameValue: {
+        type: String,
+    },
+    deliveryin: {
+        type: String,
+    },
+    timeslot: {
         type: String,
     },
     Variant: {

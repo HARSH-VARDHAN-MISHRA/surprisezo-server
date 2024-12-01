@@ -87,7 +87,7 @@ exports.getAllShopProductsByShopCategoryName = async (req, res) => {
         const shopProducts = await ShopProduct.find()
             .populate("shopName", "shopName") // Adjust fields as needed
             .populate("shopCategoryName", "shopCategoryName")
-            .populate("shopProduct", "productName"); // Customize fields to include
+            .populate("shopProduct"); // Customize fields to include
         if (!shopProducts) {
             return res.status(404).json({
                 success: false,

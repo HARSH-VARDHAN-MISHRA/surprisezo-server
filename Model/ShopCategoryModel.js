@@ -10,6 +10,10 @@ const ShopCategorySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    shopCategoryImage:{
+        type:String,
+        required:true
+    },
     productExit: {
         type: Boolean,
         default: false

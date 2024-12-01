@@ -33,7 +33,9 @@ const createProduct = async (req, res) => {
         customisecake,
         customisemessage,
         customisename,
-        customisenameValue
+        customisenameValue,
+        deliveryin,
+        timeslot
     } = req.body;
 
     // Only validate required fields
@@ -78,8 +80,8 @@ const createProduct = async (req, res) => {
         return res.status(400).json({ message: "Invalid Variant data" });
     }
 
-      // Generate a unique SKU
-      const generateSKU = async () => {
+    // Generate a unique SKU
+    const generateSKU = async () => {
         try {
             const lastProduct = await Product.findOne()
                 .sort({ createdAt: -1 })
@@ -111,6 +113,8 @@ const createProduct = async (req, res) => {
         customisemessage: customisemessage || null,
         productSubDescription: productSubDescription || null,
         productDescription: productDescription || null,
+        deliveryin: deliveryin || null,
+        timeslot: timeslot || null,
         refrenceCompany: refrenceCompany ? new mongoose.Types.ObjectId(refrenceCompany) : null, // Optional field
         innersubcategoryName: innersubcategoryName ? new mongoose.Types.ObjectId(innersubcategoryName) : null, // Optional field
         refrenceCompanyUrl: refrenceCompanyUrl || null, // Optional field
@@ -237,7 +241,9 @@ const updateProduct = async (req, res) => {
         customisename,
         customisemessage,
         customisenameValue,
-        innersubcategoryName
+        innersubcategoryName,
+        deliveryin,
+        timeslot
     } = req.body;
 
     // Only validate required fields
@@ -302,6 +308,8 @@ const updateProduct = async (req, res) => {
         product.customisemessage = customisemessage || null,
         product.productDescription = productDescription || null;
         product.customisenameValue = customisenameValue || null;
+        product.timeslot = timeslot || null;
+        product.deliveryin = deliveryin || null;
         product.refrenceCompany = validateObjectId(refrenceCompany);
         product.refrenceCompanyUrl = refrenceCompanyUrl || null;
         product.innersubcategoryName = validateObjectId(innersubcategoryName);
